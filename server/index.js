@@ -10,11 +10,11 @@ const connectDB = require('./config/db');
 
 // Validate required env vars on startup
 const requiredEnvVars = ['MONGODB_URI', 'AUTH_PASSWORD'];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    console.error(`Missing required environment variable: ${envVar}`);
-    process.exit(1);
-  }
+const missing = requiredEnvVars.filter((v) => !process.env[v]);
+if (missing.length > 0) {
+  console.error(`Missing required environment variables: ${missing.join(', ')}`);
+  console.error('Set them in your .env file (local) or in your hosting dashboard (production).');
+  process.exit(1);
 }
 
 const app = express();

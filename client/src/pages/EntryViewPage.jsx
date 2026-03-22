@@ -104,11 +104,14 @@ const EntryViewPage = () => {
         <header className={styles.header}>
           <div className={styles.headerTop}>
             <h1 className={styles.title}>{productName || 'Untitled Entry'}</h1>
-            {isAuthenticated && (
-              <Link className={styles.editBtn} to={`/entry/${id}/edit`}>
-                Edit
-              </Link>
-            )}
+            <div className={styles.headerActions}>
+              <Link className={styles.backBtn} to="/">Home</Link>
+              {isAuthenticated && (
+                <Link className={styles.editBtn} to={`/entry/${id}/edit`}>
+                  Edit
+                </Link>
+              )}
+            </div>
           </div>
           <p className={styles.date}>{formatDate(createdAt)}</p>
         </header>
@@ -382,8 +385,6 @@ const EntryViewPage = () => {
             </>
           )}
         </Section>
-
-        <Link className={styles.backLink} to="/">Back to home</Link>
       </div>
     </div>
   );

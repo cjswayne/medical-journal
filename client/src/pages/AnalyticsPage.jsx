@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +13,6 @@ import {
   Filler,
 } from 'chart.js';
 import { Bar, Line, Doughnut, Radar } from 'react-chartjs-2';
-import { useAuth } from '../hooks/useAuth';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { EFFECT_KEYS, EFFECT_LABELS, STRAIN_TYPES } from '../utils/constants';
 import { capitalize } from '../utils/formatters';
@@ -106,7 +104,6 @@ const hasAnyAnalyticsData = (d) => {
 };
 
 const AnalyticsPage = () => {
-  const { isAuthenticated, logout } = useAuth();
   const { data, loading, error, fetchAnalytics } = useAnalytics();
 
   useEffect(() => {
@@ -346,29 +343,7 @@ const AnalyticsPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <header className={styles.header}>
-          <div className={styles.titleBlock}>
-            <h1 className={styles.title}>Analytics</h1>
-            <nav className={styles.navRow} aria-label="Main">
-              <Link className={styles.navLink} to="/">
-                Home
-              </Link>
-              <Link className={styles.navLink} to="/analytics">
-                Analytics
-              </Link>
-              {isAuthenticated ? (
-                <button className={styles.authBtn} type="button" onClick={logout}>
-                  Logout
-                </button>
-              ) : (
-                <Link className={styles.authBtn} to="/login">
-                  Login
-                </Link>
-              )}
-            </nav>
-          </div>
-        </header>
-        <div className={styles.rastaStripe} role="presentation" />
+        <h1 className={styles.title}>Analytics</h1>
 
         {loading ? <p className={styles.loading}>Loading analytics...</p> : null}
 

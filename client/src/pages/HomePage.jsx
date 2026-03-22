@@ -8,7 +8,7 @@ import SearchBar from '../components/SearchBar';
 import styles from '../styles/HomePage.module.css';
 
 const HomePage = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const {
     entries,
     page,
@@ -36,29 +36,6 @@ const HomePage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <header className={styles.header}>
-          <div className={styles.titleBlock}>
-            <h1 className={styles.title}>Chuck&apos;s Weed Diary</h1>
-            <nav className={styles.navRow} aria-label="Main">
-              <Link className={styles.navLink} to="/">
-                Home
-              </Link>
-              <Link className={styles.navLink} to="/analytics">
-                Analytics
-              </Link>
-              {isAuthenticated ? (
-                <button className={styles.authBtn} type="button" onClick={logout}>
-                  Logout
-                </button>
-              ) : (
-                <Link className={styles.authBtn} to="/login">
-                  Login
-                </Link>
-              )}
-            </nav>
-          </div>
-        </header>
-        <div className={styles.rastaStripe} role="presentation" />
 
         {error ? (
           <p className={styles.errorBanner} role="alert">
@@ -68,13 +45,8 @@ const HomePage = () => {
 
         <div className={styles.toolbar}>
           <div className={styles.toolbarSearch}>
-            <SearchBar onSearch={searchEntries} placeholder="Search entries…" />
+            <SearchBar onSearch={searchEntries} placeholder="Search entries\u2026" />
           </div>
-          {isAuthenticated ? (
-            <Link className={styles.addBtn} to="/entry/new">
-              + Add Entry
-            </Link>
-          ) : null}
         </div>
 
         <div className={styles.grid}>
@@ -115,6 +87,12 @@ const HomePage = () => {
           </div>
         ) : null}
       </div>
+
+      {isAuthenticated && (
+        <Link className={styles.fab} to="/entry/new" aria-label="Add Entry">
+          +
+        </Link>
+      )}
     </div>
   );
 };

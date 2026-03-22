@@ -7,20 +7,32 @@ import StrainList from '../components/StrainList';
 import SensoryPicker from '../components/SensoryPicker';
 import EffectsRater from '../components/EffectsRater';
 import ImageUploader from '../components/ImageUploader';
-import TagInput from '../components/TagInput';
+import TerpeneSelect from '../components/TerpeneSelect';
 import {
   CANNABIS_FORMS,
   CONSUMPTION_METHODS,
   CANNABINOID_KEYS,
   CANNABINOID_LABELS,
+  todayISO,
 } from '../utils/constants';
 import { capitalize, formatDate } from '../utils/formatters';
 import styles from '../styles/EntryForm.module.css';
+
+// Clamp a numeric string within [min, max], returning '' for empty
+const clampNumeric = (raw, min, max) => {
+  if (raw === '' || raw === null || raw === undefined) return '';
+  const num = parseFloat(raw);
+  if (Number.isNaN(num)) return '';
+  if (num < min) return String(min);
+  if (num > max) return String(max);
+  return raw;
+};
 
 const buildDefaults = () => ({
   productName: '',
   strains: [],
   brand: '',
+  purchaseDate: todayISO(),
   quantity: '',
   price: '',
   priceNotes: '',
@@ -56,9 +68,16 @@ const mergeEntry = (entry) => {
   const defaults = buildDefaults();
   if (!entry) return defaults;
 
+  // Convert server date to YYYY-MM-DD for input[type=date]
+  let purchaseDate = defaults.purchaseDate;
+  if (entry.purchaseDate) {
+    purchaseDate = new Date(entry.purchaseDate).toISOString().split('T')[0];
+  }
+
   return {
     ...defaults,
     ...entry,
+    purchaseDate,
     dispensary: { ...defaults.dispensary, ...(entry.dispensary || {}) },
     cannabinoids: { ...defaults.cannabinoids, ...(entry.cannabinoids || {}) },
     terpenes: { ...defaults.terpenes, ...(entry.terpenes || {}) },
@@ -92,7 +111,6 @@ const EntryFormPage = () => {
     if (isEdit) fetchEntry(id);
   }, [isEdit, id, fetchEntry]);
 
-  // Populate form once when entry loads in edit mode
   useEffect(() => {
     if (isEdit && entry && !populated) {
       setForm(mergeEntry(entry));
@@ -111,10 +129,27 @@ const EntryFormPage = () => {
     }));
   }, []);
 
+  // Cannabinoid setter with clamping to 0-100
   const setCannabinoid = useCallback((key, raw) => {
+    const clamped = clampNumeric(raw, 0, 100);
     setForm((prev) => ({
       ...prev,
-      cannabinoids: { ...prev.cannabinoids, [key]: raw },
+      cannabinoids: { ...prev.cannabinoids, [key]: clamped },
+    }));
+  }, []);
+
+  // Clamped setter for rating fields (0-10)
+  const setClampedRating = useCallback((field, raw) => {
+    const clamped = clampNumeric(raw, 0, 10);
+    setForm((prev) => ({ ...prev, [field]: clamped }));
+  }, []);
+
+  // Clamped setter for dosage numeric fields
+  const setClampedDosage = useCallback((field, raw, min = 0, max = Infinity) => {
+    const clamped = clampNumeric(raw, min, max);
+    setForm((prev) => ({
+      ...prev,
+      dosage: { ...prev.dosage, [field]: clamped },
     }));
   }, []);
 
@@ -202,31 +237,47 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 2 - Purchase */}
-          <CollapsibleSection title="Purchase" defaultOpen={false}>
+          <CollapsibleSection title="Purchase" defaultOpen>
             <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="purchaseDate">Purchase Date</label>
+              <input
+                id="purchaseDate"
+                className={styles.input}
+                type="date"
+                max={todayISO()}
+                value={form.purchaseDate}
+                onChange={(e) => set('purchaseDate', e.target.value)}
+              />
               <div className={styles.row}>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="quantity">Quantity</label>
-                  <input
-                    id="quantity"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    value={form.quantity}
-                    onChange={(e) => set('quantity', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="quantity"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={form.quantity}
+                      onChange={(e) => set('quantity', clampNumeric(e.target.value, 0, 99999))}
+                    />
+                    <span className={styles.unit}>g</span>
+                  </div>
                 </div>
                 <div className={styles.col}>
-                  <label className={styles.label} htmlFor="price">Price ($)</label>
-                  <input
-                    id="price"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.price}
-                    onChange={(e) => set('price', e.target.value)}
-                  />
+                  <label className={styles.label} htmlFor="price">Price</label>
+                  <div className={styles.inputWithUnit}>
+                    <span className={styles.unitPrefix}>$</span>
+                    <input
+                      id="price"
+                      className={`${styles.input} ${styles.inputWithPrefix}`}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={form.price}
+                      onChange={(e) => set('price', clampNumeric(e.target.value, 0, 99999))}
+                    />
+                  </div>
                 </div>
               </div>
               <label className={styles.label} htmlFor="priceNotes">Price Notes</label>
@@ -240,7 +291,7 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 3 - Dispensary */}
-          <CollapsibleSection title="Dispensary" defaultOpen={false}>
+          <CollapsibleSection title="Dispensary" defaultOpen>
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="dispName">Name</label>
               <input
@@ -272,7 +323,7 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 4 - Form & Method */}
-          <CollapsibleSection title="Form & Method" defaultOpen={false}>
+          <CollapsibleSection title="Form & Method" defaultOpen>
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="cannabisForm">Cannabis Form</label>
               <select
@@ -349,7 +400,7 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 5 - Aroma */}
-          <CollapsibleSection title="Aroma" defaultOpen={false}>
+          <CollapsibleSection title="Aroma" defaultOpen>
             <div className={styles.fieldGroup}>
               <SensoryPicker
                 label="Aroma"
@@ -369,7 +420,7 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 6 - Flavor */}
-          <CollapsibleSection title="Flavor" defaultOpen={false}>
+          <CollapsibleSection title="Flavor" defaultOpen>
             <div className={styles.fieldGroup}>
               <SensoryPicker
                 label="Flavor"
@@ -389,70 +440,82 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 7 - Chemistry */}
-          <CollapsibleSection title="Chemistry" defaultOpen={false}>
+          <CollapsibleSection title="Chemistry" defaultOpen>
             <div className={styles.fieldGroup}>
               <div className={styles.chemGrid}>
                 {CANNABINOID_KEYS.map((key) => (
                   <div key={key} className={styles.chemCell}>
                     <label className={styles.label} htmlFor={`chem-${key}`}>
-                      {CANNABINOID_LABELS[key]} (%)
+                      {CANNABINOID_LABELS[key]}
                     </label>
-                    <input
-                      id={`chem-${key}`}
-                      className={styles.input}
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={form.cannabinoids[key]}
-                      onChange={(e) => setCannabinoid(key, e.target.value)}
-                    />
+                    <div className={styles.inputWithUnit}>
+                      <input
+                        id={`chem-${key}`}
+                        className={styles.input}
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={form.cannabinoids[key]}
+                        onChange={(e) => setCannabinoid(key, e.target.value)}
+                      />
+                      <span className={styles.unit}>%</span>
+                    </div>
                   </div>
                 ))}
               </div>
               <label className={styles.label}>Dominant Terpenes</label>
-              <TagInput
+              <TerpeneSelect
                 tags={form.terpenes.dominant}
                 onChange={(v) => setNested('terpenes', 'dominant', v)}
-                placeholder="Add dominant terpene"
+                label="dominant terpene"
               />
               <label className={styles.label}>Secondary Terpenes</label>
-              <TagInput
+              <TerpeneSelect
                 tags={form.terpenes.secondary}
                 onChange={(v) => setNested('terpenes', 'secondary', v)}
-                placeholder="Add secondary terpene"
+                label="secondary terpene"
               />
             </div>
           </CollapsibleSection>
 
           {/* 8 - Dosage */}
-          <CollapsibleSection title="Dosage" defaultOpen={false}>
+          <CollapsibleSection title="Dosage" defaultOpen>
             <div className={styles.fieldGroup}>
               <div className={styles.row}>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="amountConsumed">
                     Amount Consumed
                   </label>
-                  <input
-                    id="amountConsumed"
-                    className={styles.input}
-                    type="text"
-                    value={form.dosage.amountConsumed}
-                    onChange={(e) => setNested('dosage', 'amountConsumed', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="amountConsumed"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={form.dosage.amountConsumed}
+                      onChange={(e) => setClampedDosage('amountConsumed', e.target.value, 0, 99999)}
+                    />
+                    <span className={styles.unit}>g</span>
+                  </div>
                 </div>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="timesTaken">
                     Times Taken
                   </label>
-                  <input
-                    id="timesTaken"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    value={form.dosage.timesTaken}
-                    onChange={(e) => setNested('dosage', 'timesTaken', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="timesTaken"
+                      className={styles.input}
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={form.dosage.timesTaken}
+                      onChange={(e) => setClampedDosage('timesTaken', e.target.value, 1, 100)}
+                    />
+                    <span className={styles.unit}>×</span>
+                  </div>
                 </div>
               </div>
               <div className={styles.row}>
@@ -460,32 +523,42 @@ const EntryFormPage = () => {
                   <label className={styles.label} htmlFor="timeToEffect">
                     Time to Effect
                   </label>
-                  <input
-                    id="timeToEffect"
-                    className={styles.input}
-                    type="text"
-                    value={form.dosage.timeToEffect}
-                    onChange={(e) => setNested('dosage', 'timeToEffect', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="timeToEffect"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.dosage.timeToEffect}
+                      onChange={(e) => setClampedDosage('timeToEffect', e.target.value, 0, 1440)}
+                    />
+                    <span className={styles.unit}>min</span>
+                  </div>
                 </div>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="lengthOfEffects">
                     Length of Effects
                   </label>
-                  <input
-                    id="lengthOfEffects"
-                    className={styles.input}
-                    type="text"
-                    value={form.dosage.lengthOfEffects}
-                    onChange={(e) => setNested('dosage', 'lengthOfEffects', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="lengthOfEffects"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.dosage.lengthOfEffects}
+                      onChange={(e) => setClampedDosage('lengthOfEffects', e.target.value, 0, 1440)}
+                    />
+                    <span className={styles.unit}>min</span>
+                  </div>
                 </div>
               </div>
             </div>
           </CollapsibleSection>
 
           {/* 9 - Effects */}
-          <CollapsibleSection title="Effects" defaultOpen={false}>
+          <CollapsibleSection title="Effects" defaultOpen>
             <div className={styles.fieldGroup}>
               <EffectsRater
                 effects={form.effects}
@@ -513,45 +586,51 @@ const EntryFormPage = () => {
           </CollapsibleSection>
 
           {/* 10 - Ratings */}
-          <CollapsibleSection title="Ratings" defaultOpen={false}>
+          <CollapsibleSection title="Ratings" defaultOpen>
             <div className={styles.fieldGroup}>
               <div className={styles.row}>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="medicalRating">
-                    Medical Rating (0–10)
+                    Medical Rating
                   </label>
-                  <input
-                    id="medicalRating"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={form.medicalRating}
-                    onChange={(e) => set('medicalRating', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="medicalRating"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      value={form.medicalRating}
+                      onChange={(e) => setClampedRating('medicalRating', e.target.value)}
+                    />
+                    <span className={styles.unit}>/10</span>
+                  </div>
                 </div>
                 <div className={styles.col}>
                   <label className={styles.label} htmlFor="recreationalRating">
-                    Recreational Rating (0–10)
+                    Recreational Rating
                   </label>
-                  <input
-                    id="recreationalRating"
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={form.recreationalRating}
-                    onChange={(e) => set('recreationalRating', e.target.value)}
-                  />
+                  <div className={styles.inputWithUnit}>
+                    <input
+                      id="recreationalRating"
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      value={form.recreationalRating}
+                      onChange={(e) => setClampedRating('recreationalRating', e.target.value)}
+                    />
+                    <span className={styles.unit}>/10</span>
+                  </div>
                 </div>
               </div>
             </div>
           </CollapsibleSection>
 
           {/* 11 - Images */}
-          <CollapsibleSection title="Images" defaultOpen={false}>
+          <CollapsibleSection title="Images" defaultOpen>
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Flower Image</label>
               <ImageUploader
@@ -583,7 +662,7 @@ const EntryFormPage = () => {
               className={styles.saveBtn}
               disabled={submitting || !form.productName.trim()}
             >
-              {submitting ? 'Saving…' : isEdit ? 'Update Entry' : 'Create Entry'}
+              {submitting ? 'Saving\u2026' : isEdit ? 'Update Entry' : 'Create Entry'}
             </button>
           </div>
         </form>

@@ -10,6 +10,7 @@ const entrySchema = new mongoose.Schema({
   brand: { type: String, trim: true, default: '' },
 
   // Purchase
+  purchaseDate: { type: Date, default: null },
   quantity: { type: Number, min: 0, default: null },
   price: { type: Number, min: 0, default: null },
   priceNotes: { type: String, default: '' },

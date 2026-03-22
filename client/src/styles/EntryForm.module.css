@@ -126,6 +126,43 @@
   gap: var(--spacing-xs);
 }
 
+/* Input with unit suffix/prefix */
+.inputWithUnit {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.inputWithUnit .input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.unit {
+  position: absolute;
+  right: 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.unitPrefix {
+  position: absolute;
+  left: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inputWithPrefix {
+  padding-left: 24px;
+}
+
 /* Cannabinoid grid */
 .chemGrid {
   display: grid;

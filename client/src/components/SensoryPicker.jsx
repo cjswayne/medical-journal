@@ -29,12 +29,18 @@ const SensoryPicker = ({ label, options, selected, onChange, onAddCustom }) => {
     );
   };
 
-  const handleAddCustom = (e) => {
-    e.preventDefault();
+  const handleAddCustom = () => {
     const name = customText.trim();
     if (!name || typeof onAddCustom !== 'function') return;
     onAddCustom(name);
     setCustomText('');
+  };
+
+  const handleCustomKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddCustom();
+    }
   };
 
   return (
@@ -80,7 +86,7 @@ const SensoryPicker = ({ label, options, selected, onChange, onAddCustom }) => {
           );
         })}
       </div>
-      <form className={styles.customForm} onSubmit={handleAddCustom}>
+      <div className={styles.customForm}>
         <label className={styles.customLabel} htmlFor={`${baseId}-custom`}>
           Add custom
         </label>
@@ -91,18 +97,20 @@ const SensoryPicker = ({ label, options, selected, onChange, onAddCustom }) => {
             type="text"
             value={customText}
             onChange={(e) => setCustomText(e.target.value)}
+            onKeyDown={handleCustomKeyDown}
             placeholder="Custom note"
             autoComplete="off"
           />
           <button
-            type="submit"
+            type="button"
             className={styles.addBtn}
+            onClick={handleAddCustom}
             disabled={!customText.trim() || typeof onAddCustom !== 'function'}
           >
             Add
           </button>
         </div>
-      </form>
+      </div>
     </fieldset>
   );
 };
