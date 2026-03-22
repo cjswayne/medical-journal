@@ -1,0 +1,54 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+/* Size variants */
+.sm {
+  font-size: 0.625rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.sm .svg {
+  width: 16px;
+  height: 14px;
+}
+
+.md {
+  font-size: 0.8125rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.md .svg {
+  width: 24px;
+  height: 20px;
+}
+
+.lg {
+  font-size: 0.9375rem;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.lg .svg {
+  width: 32px;
+  height: 28px;
+}
+
+.svg {
+  color: var(--color-accent-green);
+  flex-shrink: 0;
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

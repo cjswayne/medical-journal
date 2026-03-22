@@ -17,7 +17,7 @@ const StrainList = ({ strains = [], onChange }) => {
   };
 
   const addRow = () => {
-    emit([...strains, { name: '', type: STRAIN_TYPES[0] }]);
+    emit([...strains, { name: '', type: '' }]);
   };
 
   return (
@@ -42,9 +42,10 @@ const StrainList = ({ strains = [], onChange }) => {
             <select
               id={`strain-type-${index}`}
               className={styles.select}
-              value={row.type ?? STRAIN_TYPES[0]}
+              value={row.type ?? ''}
               onChange={(e) => updateRow(index, { type: e.target.value })}
             >
+              <option value="">— Type —</option>
               {STRAIN_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {capitalize(t)}

@@ -5,11 +5,15 @@ const authCheck = require('../middleware/authCheck');
 
 const router = express.Router();
 
-const CONDENSED_SELECT = '_id productName flowerImageUrl terpenes.dominant createdAt';
+const CONDENSED_SELECT = '_id productName flowerImageUrl strains purchaseDate dispensary.location cannabinoids.thc cannabinoids.cbd medicalRating recreationalRating terpenes.dominant terpenes.secondary effects createdAt';
 
-// Short-lived CDN/browser cache for read-only entry responses
+// Cache for detail/search reads only; list endpoint uses no-cache to avoid stale data after writes
 function setPublicCache(res) {
   res.set('Cache-Control', 'public, max-age=60');
+}
+
+function setNoCache(res) {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 }
 
 router.get('/', async (req, res) => {
@@ -28,7 +32,7 @@ router.get('/', async (req, res) => {
         .lean(),
     ]);
 
-    setPublicCache(res);
+    setNoCache(res);
     const pages = total === 0 ? 1 : Math.ceil(total / limit);
     res.json({ entries, total, page, pages });
   } catch (err) {

@@ -45,7 +45,7 @@ const HomePage = () => {
 
         <div className={styles.toolbar}>
           <div className={styles.toolbarSearch}>
-            <SearchBar onSearch={searchEntries} placeholder="Search entries\u2026" />
+            <SearchBar onSearch={searchEntries} placeholder="Search entries" />
           </div>
         </div>
 

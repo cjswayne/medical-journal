@@ -51,7 +51,7 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 3px;
   padding: var(--spacing-sm);
   flex: 1;
   min-height: 0;
@@ -60,7 +60,7 @@
 @media (min-width: 480px) {
   .body {
     padding: var(--spacing-md);
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
 }
 
@@ -83,73 +83,113 @@
   }
 }
 
-/* Stat pills row */
-.stats {
+/* Strains row */
+.strains {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
 }
 
-.stat {
+.strain {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   font-size: 0.65rem;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 @media (min-width: 480px) {
-  .stat {
+  .strain {
     font-size: 0.7rem;
-    padding: 2px 6px;
   }
 }
 
-.statLabel {
-  color: var(--color-text-secondary);
-  font-weight: 500;
+.strainName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
 }
 
-.statValue {
-  color: var(--color-accent-green);
-  font-weight: 600;
+.strainBadge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0px 4px;
+  border-radius: 3px;
+  color: var(--color-primary-dark);
+  line-height: 1.4;
 }
 
-/* Terpene tags */
+@media (min-width: 480px) {
+  .strainBadge {
+    font-size: 0.6rem;
+    padding: 1px 5px;
+  }
+}
+
+/* Terpene */
 .terpenes {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
 
-.tag {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  padding: 1px 5px;
-  border-radius: var(--radius-input);
-  background: var(--color-input-bg);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+/* Recreational rating */
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
 }
 
 @media (min-width: 480px) {
-  .tag {
+  .ratingRow {
     font-size: 0.7rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
 
-.tagSecondary {
-  opacity: 0.75;
+.ratingLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
+.ratingValue {
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+/* Top effects */
+.effectsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.effectPill {
+  font-size: 0.6rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.effectPill strong {
+  color: var(--color-accent-green);
+  font-weight: 600;
+}
+
+@media (min-width: 480px) {
+  .effectPill {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+/* Date */
 .date {
   margin-top: auto;
   font-family: var(--font-body);
@@ -160,5 +200,22 @@
 @media (min-width: 480px) {
   .date {
     font-size: 0.75rem;
+  }
+}
+
+/* Location */
+.location {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: var(--color-text-secondary);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 480px) {
+  .location {
+    font-size: 0.7rem;
   }
 }

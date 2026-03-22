@@ -8,6 +8,7 @@ import SensoryPicker from '../components/SensoryPicker';
 import EffectsRater from '../components/EffectsRater';
 import ImageUploader from '../components/ImageUploader';
 import TerpeneSelect from '../components/TerpeneSelect';
+import MapEmbed from '../components/MapEmbed';
 import {
   CANNABIS_FORMS,
   CONSUMPTION_METHODS,
@@ -161,7 +162,8 @@ const EntryFormPage = () => {
       const saved = isEdit
         ? await updateEntry(id, form)
         : await createEntry(form);
-      navigate(`/entry/${saved._id}`);
+      // After create, go to edit so user can continue refining; after update, go to view
+      navigate(isEdit ? `/entry/${saved._id}` : `/entry/${saved._id}/edit`);
     } catch (err) {
       console.error('EntryFormPage submit:', err);
       setSubmitError(err.message || 'Failed to save entry');
@@ -319,6 +321,12 @@ const EntryFormPage = () => {
                 value={form.dispensary.website}
                 onChange={(e) => setNested('dispensary', 'website', e.target.value)}
               />
+
+              {form.dispensary.location && (
+                <div className={styles.mapPreview}>
+                  <MapEmbed location={form.dispensary.location} />
+                </div>
+              )}
             </div>
           </CollapsibleSection>
 

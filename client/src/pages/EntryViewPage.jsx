@@ -1,8 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+} from 'chart.js';
+import { Radar } from 'react-chartjs-2';
 import { useAuth } from '../hooks/useAuth';
 import { useEntries } from '../hooks/useEntries';
 import MapEmbed from '../components/MapEmbed';
+import TerpeneTag from '../components/TerpeneTag';
 import {
   CANNABINOID_KEYS,
   CANNABINOID_LABELS,
@@ -18,6 +28,8 @@ import {
   capitalize,
 } from '../utils/formatters';
 import styles from '../styles/EntryView.module.css';
+
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip);
 
 const STRAIN_TYPE_COLORS = {
   sativa: 'var(--color-gold)',
@@ -85,7 +97,7 @@ const EntryViewPage = () => {
     effects, symptomsRelievedNotes, otherEffectsNotes,
     medicalRating, recreationalRating,
     flowerImageUrl, coaImageUrls,
-    createdAt,
+    purchaseDate, createdAt,
   } = entry;
 
   const displayForm = cannabisForm === 'other' ? customCannabisForm : cannabisForm;
@@ -97,23 +109,65 @@ const EntryViewPage = () => {
     (k) => effects?.[k] != null && Number(effects[k]) > 0
   );
   const coaUrls = Array.isArray(coaImageUrls) ? coaImageUrls.filter(Boolean) : [];
+  const displayDate = purchaseDate || createdAt;
+  const thumbSrc = flowerImageUrl ? cloudinaryTransform(flowerImageUrl, 150) : '';
+
+  const radarData = useMemo(() => ({
+    labels: EFFECT_KEYS.map((k) => EFFECT_LABELS[k] || k),
+    datasets: [{
+      label: 'Effects',
+      data: EFFECT_KEYS.map((k) => {
+        const v = effects?.[k];
+        return v != null && !Number.isNaN(Number(v)) ? Number(v) : 0;
+      }),
+      backgroundColor: 'rgba(76, 175, 80, 0.25)',
+      borderColor: '#4CAF50',
+      borderWidth: 2,
+      pointBackgroundColor: '#4CAF50',
+      pointBorderColor: '#E8F5E9',
+    }],
+  }), [effects]);
+
+  const radarOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 10,
+        angleLines: { color: '#1B5E20' },
+        grid: { color: '#1B5E20' },
+        pointLabels: { color: '#A5D6A7', font: { size: 10 } },
+        ticks: {
+          color: '#A5D6A7',
+          backdropColor: 'transparent',
+          showLabelBackdrop: false,
+        },
+      },
+    },
+    plugins: { legend: { display: false } },
+  }), []);
 
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
         <header className={styles.header}>
           <div className={styles.headerTop}>
-            <h1 className={styles.title}>{productName || 'Untitled Entry'}</h1>
-            <div className={styles.headerActions}>
-              <Link className={styles.backBtn} to="/">Home</Link>
-              {isAuthenticated && (
-                <Link className={styles.editBtn} to={`/entry/${id}/edit`}>
-                  Edit
-                </Link>
-              )}
+            {thumbSrc && (
+              <img
+                className={styles.thumb}
+                src={thumbSrc}
+                alt=""
+                width={75}
+                height={75}
+                loading="lazy"
+              />
+            )}
+            <div>
+              <h1 className={styles.title}>{productName || 'Untitled Entry'}</h1>
+              <p className={styles.date}>{formatDate(displayDate)}</p>
             </div>
           </div>
-          <p className={styles.date}>{formatDate(createdAt)}</p>
         </header>
         <div className={styles.rastaStripe} role="presentation" />
 
@@ -124,12 +178,14 @@ const EntryViewPage = () => {
               {strains.map((s, i) => (
                 <li key={`${s.name}-${i}`} className={styles.strainItem}>
                   <span className={styles.strainName}>{s.name}</span>
-                  <span
-                    className={styles.strainBadge}
-                    style={{ backgroundColor: STRAIN_TYPE_COLORS[s.type] || 'var(--color-border)' }}
-                  >
-                    {capitalize(s.type)}
-                  </span>
+                  {s.type && (
+                    <span
+                      className={styles.strainBadge}
+                      style={{ backgroundColor: STRAIN_TYPE_COLORS[s.type] || 'var(--color-border)' }}
+                    >
+                      {capitalize(s.type)}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -141,7 +197,7 @@ const EntryViewPage = () => {
         <Section title="Purchase" visible={hasContent(quantity) || hasContent(price) || hasContent(priceNotes)}>
           <div className={styles.metaGrid}>
             {hasContent(quantity) && (
-              <p className={styles.meta}><span className={styles.metaLabel}>Quantity:</span> {quantity}</p>
+              <p className={styles.meta}><span className={styles.metaLabel}>Quantity:</span> {quantity}g</p>
             )}
             {hasContent(price) && (
               <p className={styles.meta}><span className={styles.metaLabel}>Price:</span> {formatCurrency(price)}</p>
@@ -253,7 +309,7 @@ const EntryViewPage = () => {
               <span className={styles.metaLabel}>Dominant:</span>
               <div className={styles.tagList}>
                 {terpenes.dominant.map((t, i) => (
-                  <span key={`d-${t}-${i}`} className={styles.tag}>{t}</span>
+                  <TerpeneTag key={`d-${t}-${i}`} name={t} size="md" />
                 ))}
               </div>
             </div>
@@ -263,7 +319,7 @@ const EntryViewPage = () => {
               <span className={styles.metaLabel}>Secondary:</span>
               <div className={styles.tagList}>
                 {terpenes.secondary.map((t, i) => (
-                  <span key={`s-${t}-${i}`} className={styles.tag}>{t}</span>
+                  <TerpeneTag key={`s-${t}-${i}`} name={t} size="md" />
                 ))}
               </div>
             </div>
@@ -275,22 +331,22 @@ const EntryViewPage = () => {
           <div className={styles.metaGrid}>
             {dosage?.amountConsumed && (
               <p className={styles.meta}>
-                <span className={styles.metaLabel}>Amount:</span> {dosage.amountConsumed}
+                <span className={styles.metaLabel}>Amount:</span> {dosage.amountConsumed}g
               </p>
             )}
             {dosage?.timesTaken && (
               <p className={styles.meta}>
-                <span className={styles.metaLabel}>Times Taken:</span> {dosage.timesTaken}
+                <span className={styles.metaLabel}>Times Taken:</span> {dosage.timesTaken}×
               </p>
             )}
             {dosage?.timeToEffect && (
               <p className={styles.meta}>
-                <span className={styles.metaLabel}>Time to Effect:</span> {dosage.timeToEffect}
+                <span className={styles.metaLabel}>Time to Effect:</span> {dosage.timeToEffect} min
               </p>
             )}
             {dosage?.lengthOfEffects && (
               <p className={styles.meta}>
-                <span className={styles.metaLabel}>Duration:</span> {dosage.lengthOfEffects}
+                <span className={styles.metaLabel}>Duration:</span> {dosage.lengthOfEffects} min
               </p>
             )}
           </div>
@@ -299,24 +355,8 @@ const EntryViewPage = () => {
         {/* Effects */}
         <Section title="Effects" visible={activeEffects.length > 0 || hasContent(symptomsRelievedNotes) || hasContent(otherEffectsNotes)}>
           {activeEffects.length > 0 && (
-            <div className={styles.effectBars}>
-              {activeEffects.map((key) => {
-                const val = Number(effects[key]);
-                return (
-                  <div key={key} className={styles.effectRow}>
-                    <span className={styles.effectLabel}>
-                      {EFFECT_LABELS[key] ?? key}
-                    </span>
-                    <div className={styles.effectTrack}>
-                      <div
-                        className={styles.effectFill}
-                        style={{ width: `${(val / 10) * 100}%` }}
-                      />
-                    </div>
-                    <span className={styles.effectVal}>{val}</span>
-                  </div>
-                );
-              })}
+            <div className={styles.radarWrap}>
+              <Radar data={radarData} options={radarOptions} />
             </div>
           )}
           {symptomsRelievedNotes && (
@@ -386,6 +426,12 @@ const EntryViewPage = () => {
           )}
         </Section>
       </div>
+
+      {isAuthenticated && (
+        <Link className={styles.editFab} to={`/entry/${id}/edit`} aria-label="Edit entry">
+          &#9998;
+        </Link>
+      )}
     </div>
   );
 };

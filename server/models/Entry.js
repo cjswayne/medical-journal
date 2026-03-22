@@ -5,7 +5,7 @@ const entrySchema = new mongoose.Schema({
   productName: { type: String, required: true, trim: true },
   strains: [{
     name: { type: String, required: true, trim: true },
-    type: { type: String, enum: ['sativa', 'indica', 'hybrid'], required: true }
+    type: { type: String, enum: ['sativa', 'indica', 'hybrid', ''], default: '' }
   }],
   brand: { type: String, trim: true, default: '' },
 
