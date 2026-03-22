@@ -15,6 +15,8 @@ import {
   CANNABINOID_LABELS,
   STRAIN_TYPES,
   todayISO,
+  HIGHNESS_COLORS,
+  HIGHNESS_LABELS,
 } from '../utils/constants';
 import { capitalize, formatDate } from '../utils/formatters';
 import styles from '../styles/EntryForm.module.css';
@@ -57,6 +59,7 @@ const buildDefaults = () => ({
     timeToEffect: '',
     lengthOfEffects: '',
   },
+  highnessColor: '',
   effects: {},
   symptomsRelievedNotes: '',
   otherEffectsNotes: '',
@@ -615,6 +618,28 @@ const EntryFormPage = () => {
                     <span className={styles.unit}>min</span>
                   </div>
                 </div>
+              </div>
+
+              <label className={styles.label}>What is my color</label>
+              <div className={styles.colorButtonRow}>
+                {HIGHNESS_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    className={`${styles.colorButton} ${styles[`colorButton_${color}`]} ${form.highnessColor === color ? styles.colorButtonSelected : ''}`}
+                    onClick={() => set('highnessColor', color)}
+                    title={HIGHNESS_LABELS[color]}
+                    aria-pressed={form.highnessColor === color}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.colorKeyInfo}>
+                <span className={styles.colorKeyInfoIcon} aria-hidden title="Color key">&#9432;</span>
+                <span className={styles.colorKeyText}>
+                  {HIGHNESS_COLORS.map((c) => `${c} = ${HIGHNESS_LABELS[c]}`).join(' · ')}
+                </span>
               </div>
             </div>
           </CollapsibleSection>

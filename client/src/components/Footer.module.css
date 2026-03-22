@@ -1,0 +1,43 @@
+.footer {
+  margin-top: auto;
+  background-color: var(--color-primary-dark);
+  border-top: 1px solid var(--color-border);
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.links {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.links a {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.links a:hover {
+  color: var(--color-accent-green);
+}
+
+.stripe {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    var(--color-accent-green) 0%,
+    var(--color-accent-green) 33.33%,
+    var(--color-gold) 33.33%,
+    var(--color-gold) 66.67%,
+    var(--color-rasta-red) 66.67%,
+    var(--color-rasta-red) 100%
+  );
+}

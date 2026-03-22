@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -28,6 +29,7 @@ const Layout = ({ children }) => {
     <>
       {!hideNav && <Navbar />}
       {children}
+      {!hideNav && <Footer />}
     </>
   );
 };

@@ -140,6 +140,63 @@
   gap: 4px;
 }
 
+/* Highness color */
+.highnessColor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+}
+
+.highnessColorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.highnessColor_green {
+  background-color: #4caf50;
+}
+
+.highnessColor_orange {
+  background-color: #ff9800;
+}
+
+.highnessColor_red {
+  background-color: #f44336;
+}
+
+.highnessColor_pink {
+  background-color: #e91e63;
+}
+
+.highnessColor_purple {
+  background-color: #9c27b0;
+}
+
+.highnessColor_black {
+  background-color: #212121;
+}
+
+.highnessColorLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 480px) {
+  .highnessColor {
+    font-size: 0.7rem;
+  }
+
+  .highnessColorDot {
+    width: 9px;
+    height: 9px;
+  }
+}
+
 /* Recreational rating */
 .ratingRow {
   display: flex;

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { cloudinaryTransform, EFFECT_LABELS } from '../utils/constants';
+import { cloudinaryTransform, EFFECT_LABELS, HIGHNESS_LABELS } from '../utils/constants';
 import { formatDate, capitalize } from '../utils/formatters';
 import TerpeneTag from './TerpeneTag';
 import styles from './EntryCard.module.css';
@@ -31,7 +31,7 @@ const topEffects = (effects, n = 2) => {
 const EntryCard = ({ entry }) => {
   const {
     _id, productName, productType, flowerImageUrl, purchaseDate, createdAt,
-    strains, recreationalRating, terpenes, effects, dispensary,
+    strains, recreationalRating, terpenes, effects, dispensary, highnessColor,
   } = entry || {};
 
   const imgSrc = flowerImageUrl ? cloudinaryTransform(flowerImageUrl, 200) : '';
@@ -83,6 +83,17 @@ const EntryCard = ({ entry }) => {
         {dominant && (
           <div className={styles.terpenes}>
             <TerpeneTag name={dominant} size="sm" />
+          </div>
+        )}
+
+        {/* Highness color indicator */}
+        {highnessColor && HIGHNESS_LABELS[highnessColor] && (
+          <div className={styles.highnessColor} title={HIGHNESS_LABELS[highnessColor]}>
+            <span
+              className={`${styles.highnessColorDot} ${styles[`highnessColor_${highnessColor}`]}`}
+              aria-hidden
+            />
+            <span className={styles.highnessColorLabel}>{HIGHNESS_LABELS[highnessColor]}</span>
           </div>
         )}
 

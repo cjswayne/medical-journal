@@ -61,9 +61,9 @@ const HomePage = () => {
                 <EntryCard key={entry._id} entry={entry} />
               ))
             : null}
-        </div>
+        </div> 
 
-        {pages > 1 ? (
+        {pages > 1 ? (  
           <div className={styles.pagination}>
             <button
               className={styles.pageBtn}

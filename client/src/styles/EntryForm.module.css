@@ -251,3 +251,83 @@
 .mapPreview {
   margin-top: var(--spacing-sm);
 }
+
+/* Highness color buttons */
+.colorButtonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.colorButton {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.8125rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  border: 2px solid transparent;
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  color: var(--color-primary-dark);
+}
+
+.colorButton:focus-visible {
+  outline: 2px solid var(--color-accent-green);
+  outline-offset: 2px;
+}
+
+.colorButtonSelected {
+  border-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--color-text-primary);
+}
+
+.colorButton_green {
+  background-color: #4caf50;
+}
+
+.colorButton_orange {
+  background-color: #ff9800;
+}
+
+.colorButton_red {
+  background-color: #f44336;
+}
+
+.colorButton_pink {
+  background-color: #e91e63;
+}
+
+.colorButton_purple {
+  background-color: #9c27b0;
+}
+
+.colorButton_black {
+  background-color: #212121;
+  color: #fff;
+}
+
+.colorKeyInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.colorKeyInfoIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.colorKeyText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

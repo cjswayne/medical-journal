@@ -17,6 +17,7 @@ import {
   CANNABINOID_LABELS,
   EFFECT_KEYS,
   EFFECT_LABELS,
+  HIGHNESS_LABELS,
   cloudinaryTransform,
 } from '../utils/constants';
 import {
@@ -35,6 +36,16 @@ const STRAIN_TYPE_COLORS = {
   indica: 'var(--color-accent-purple)',
   hybrid: 'var(--color-accent-green)',
 };
+
+const HIGHNESS_COLOR_BG = {
+  green: '#4caf50',
+  orange: '#ff9800',
+  red: '#f44336',
+  pink: '#e91e63',
+  purple: '#9c27b0',
+  black: '#212121',
+};
+const getHighnessColorBg = (c) => HIGHNESS_COLOR_BG[c] || 'var(--color-border)';
 
 const hasContent = (val) => {
   if (val === null || val === undefined || val === '') return false;
@@ -133,6 +144,7 @@ const EntryViewPage = () => {
     flavors, flavorNotes,
     cannabinoids, terpenes,
     dosage,
+    highnessColor,
     effects, symptomsRelievedNotes, otherEffectsNotes,
     medicalRating, recreationalRating,
     notes,
@@ -341,8 +353,19 @@ const EntryViewPage = () => {
         </Section>
 
         {/* Dosage */}
-        <Section title="Dosage" visible={hasContent(dosage)}>
+        <Section title="Dosage" visible={hasContent(dosage) || hasContent(highnessColor)}>
           <div className={styles.metaGrid}>
+            {highnessColor && HIGHNESS_LABELS[highnessColor] && (
+              <p className={styles.meta}>
+                <span className={styles.metaLabel}>Highness:</span>{' '}
+                <span
+                  className={styles.highnessBadge}
+                  style={{ backgroundColor: getHighnessColorBg(highnessColor) }}
+                >
+                  {HIGHNESS_LABELS[highnessColor]}
+                </span>
+              </p>
+            )}
             {dosage?.amountConsumed && (
               <p className={styles.meta}>
                 <span className={styles.metaLabel}>Amount:</span> {dosage.amountConsumed}g

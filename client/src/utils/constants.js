@@ -97,3 +97,14 @@ export const cloudinaryTransform = (url, width = 400) => {
 
 // Format today as YYYY-MM-DD for date inputs
 export const todayISO = () => new Date().toISOString().split('T')[0];
+
+// Highness color scale (color -> meaning)
+export const HIGHNESS_COLORS = ['green', 'orange', 'red', 'pink', 'purple', 'black'];
+export const HIGHNESS_LABELS = {
+  green: 'Sober',
+  orange: 'A little high',
+  red: 'Normal high',
+  pink: 'Super high',
+  purple: 'Super duper high',
+  black: 'Greened out',
+};

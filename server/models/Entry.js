@@ -82,6 +82,13 @@ const entrySchema = new mongoose.Schema({
     lengthOfEffects: { type: String, default: '' }
   },
 
+  // Highness color (green=sober through black=greened out)
+  highnessColor: {
+    type: String,
+    enum: ['', 'green', 'orange', 'red', 'pink', 'purple', 'black'],
+    default: ''
+  },
+
   // Effects (all 0-10 integers)
   effects: {
     painRelief:   { type: Number, min: 0, max: 10, default: 0 },
