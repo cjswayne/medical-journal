@@ -9,6 +9,9 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 // Validate required env vars on startup
+console.log('Starting server...');
+console.log('MONGODB_URI set:', !!process.env.MONGODB_URI);
+console.log('AUTH_PASSWORD set:', !!process.env.AUTH_PASSWORD);
 const requiredEnvVars = ['MONGODB_URI', 'AUTH_PASSWORD'];
 const missing = requiredEnvVars.filter((v) => !process.env[v]);
 if (missing.length > 0) {
