@@ -8,7 +8,6 @@ import SensoryPicker from '../components/SensoryPicker';
 import EffectsRater from '../components/EffectsRater';
 import ImageUploader from '../components/ImageUploader';
 import TerpeneSelect from '../components/TerpeneSelect';
-import MapEmbed from '../components/MapEmbed';
 import {
   CANNABIS_FORMS,
   CONSUMPTION_METHODS,

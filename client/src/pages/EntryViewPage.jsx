@@ -11,7 +11,6 @@ import {
 import { Radar } from 'react-chartjs-2';
 import { useAuth } from '../hooks/useAuth';
 import { useEntries } from '../hooks/useEntries';
-import MapEmbed from '../components/MapEmbed';
 import TerpeneTag from '../components/TerpeneTag';
 import {
   CANNABINOID_KEYS,
@@ -238,7 +237,6 @@ const EntryViewPage = () => {
               </a>
             </p>
           )}
-          {dispensary?.location && <MapEmbed location={dispensary.location} />}
         </Section>
 
         {/* Form & Method */}
