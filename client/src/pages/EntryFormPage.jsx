@@ -321,12 +321,6 @@ const EntryFormPage = () => {
                 value={form.dispensary.website}
                 onChange={(e) => setNested('dispensary', 'website', e.target.value)}
               />
-
-              {form.dispensary.location && (
-                <div className={styles.mapPreview}>
-                  <MapEmbed location={form.dispensary.location} />
-                </div>
-              )}
             </div>
           </CollapsibleSection>
 
