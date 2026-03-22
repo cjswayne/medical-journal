@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Chart as ChartJS,
@@ -57,10 +57,14 @@ const EntryViewPage = () => {
   const { id } = useParams();
   const { isAuthenticated } = useAuth();
   const { entry, loading, error, fetchEntry } = useEntries();
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   useEffect(() => {
     if (id) fetchEntry(id);
   }, [id, fetchEntry]);
+
+  const openLightbox = useCallback((src) => setLightboxSrc(src), []);
+  const closeLightbox = useCallback(() => setLightboxSrc(null), []);
 
   const radarData = useMemo(() => ({
     labels: EFFECT_KEYS.map((k) => EFFECT_LABELS[k] || k),
@@ -132,7 +136,7 @@ const EntryViewPage = () => {
     effects, symptomsRelievedNotes, otherEffectsNotes,
     medicalRating, recreationalRating,
     notes,
-    flowerImageUrl, coaImageUrls,
+    flowerImageUrl, coaImageUrls, miscImageUrls,
     purchaseDate, createdAt,
   } = entry;
 
@@ -145,6 +149,7 @@ const EntryViewPage = () => {
     (k) => effects?.[k] != null && Number(effects[k]) > 0
   );
   const coaUrls = Array.isArray(coaImageUrls) ? coaImageUrls.filter(Boolean) : [];
+  const miscUrls = Array.isArray(miscImageUrls) ? miscImageUrls.filter(Boolean) : [];
   const displayDate = purchaseDate || createdAt;
   const thumbSrc = flowerImageUrl ? cloudinaryTransform(flowerImageUrl, 150) : '';
 
@@ -411,7 +416,7 @@ const EntryViewPage = () => {
         </Section>
 
         {/* Images */}
-        <Section title="Images" visible={hasContent(flowerImageUrl) || coaUrls.length > 0}>
+        <Section title="Images" visible={hasContent(flowerImageUrl) || coaUrls.length > 0 || miscUrls.length > 0}>
           {flowerImageUrl && (
             <div className={styles.heroImgWrap}>
               <img
@@ -419,6 +424,10 @@ const EntryViewPage = () => {
                 src={cloudinaryTransform(flowerImageUrl, 800)}
                 alt={productName || 'Flower'}
                 loading="lazy"
+                onClick={() => openLightbox(cloudinaryTransform(flowerImageUrl, 1600))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && openLightbox(cloudinaryTransform(flowerImageUrl, 1600))}
               />
             </div>
           )}
@@ -430,9 +439,33 @@ const EntryViewPage = () => {
                   <img
                     key={`coa-${i}`}
                     className={styles.galleryImg}
-                    src={cloudinaryTransform(url, 400)}
+                    src={cloudinaryTransform(url, 1600)}
                     alt={`COA ${i + 1}`}
                     loading="lazy"
+                    onClick={() => openLightbox(cloudinaryTransform(url, 2400))}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && openLightbox(cloudinaryTransform(url, 2400))}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {miscUrls.length > 0 && (
+            <>
+              <h3 className={styles.subTitle}>Misc Images</h3>
+              <div className={styles.gallery}>
+                {miscUrls.map((url, i) => (
+                  <img
+                    key={`misc-${i}`}
+                    className={styles.galleryImg}
+                    src={cloudinaryTransform(url, 1600)}
+                    alt={`Misc ${i + 1}`}
+                    loading="lazy"
+                    onClick={() => openLightbox(cloudinaryTransform(url, 2400))}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && openLightbox(cloudinaryTransform(url, 2400))}
                   />
                 ))}
               </div>
@@ -440,6 +473,32 @@ const EntryViewPage = () => {
           )}
         </Section>
       </div>
+
+      {lightboxSrc && (
+        <div
+          className={styles.lightbox}
+          onClick={closeLightbox}
+          onKeyDown={(e) => e.key === 'Escape' && closeLightbox()}
+          role="dialog"
+          aria-label="Enlarged image"
+          tabIndex={-1}
+        >
+          <img
+            className={styles.lightboxImg}
+            src={lightboxSrc}
+            alt="Enlarged view"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className={styles.lightboxClose}
+            onClick={closeLightbox}
+            aria-label="Close"
+            type="button"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       {isAuthenticated && (
         <Link className={styles.editFab} to={`/entry/${id}/edit`} aria-label="Edit entry">

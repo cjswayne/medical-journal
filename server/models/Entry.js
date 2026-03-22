@@ -115,7 +115,8 @@ const entrySchema = new mongoose.Schema({
 
   // Images
   flowerImageUrl: { type: String, default: '' },
-  coaImageUrls:   [{ type: String }]
+  coaImageUrls:   [{ type: String }],
+  miscImageUrls:  [{ type: String }],
 
 }, { timestamps: true });
 

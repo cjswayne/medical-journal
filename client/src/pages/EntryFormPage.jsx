@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEntries } from '../hooks/useEntries';
 import { useOptions } from '../hooks/useOptions';
@@ -65,6 +65,7 @@ const buildDefaults = () => ({
   notes: '',
   flowerImageUrl: '',
   coaImageUrls: [],
+  miscImageUrls: [],
 });
 
 const mergeEntry = (entry) => {
@@ -90,8 +91,11 @@ const mergeEntry = (entry) => {
     flavors: Array.isArray(entry.flavors) ? entry.flavors : [],
     strains: Array.isArray(entry.strains) ? entry.strains : [],
     coaImageUrls: Array.isArray(entry.coaImageUrls) ? entry.coaImageUrls : [],
+    miscImageUrls: Array.isArray(entry.miscImageUrls) ? entry.miscImageUrls : [],
   };
 };
+
+const AUTOSAVE_DELAY = 1500;
 
 const EntryFormPage = () => {
   const { id } = useParams();
@@ -102,9 +106,22 @@ const EntryFormPage = () => {
   const { aromaOptions, flavorOptions, fetchAllOptions, addOption } = useOptions();
 
   const [form, setForm] = useState(buildDefaults);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
   const [populated, setPopulated] = useState(false);
+
+  // Auto-save state: 'idle' | 'saving' | 'saved' | 'error'
+  const [saveStatus, setSaveStatus] = useState('idle');
+  const [saveError, setSaveError] = useState(null);
+
+  // Ref to track the live entry id (may change after first create)
+  const entryIdRef = useRef(isEdit ? id : null);
+  const formRef = useRef(form);
+  formRef.current = form;
+
+  // Track whether a save is already in-flight to avoid overlapping requests
+  const savingRef = useRef(false);
+  const timerRef = useRef(null);
+  // Track whether any user edit has happened (prevents auto-save on initial load)
+  const dirtyRef = useRef(false);
 
   useEffect(() => {
     fetchAllOptions();
@@ -121,19 +138,64 @@ const EntryFormPage = () => {
     }
   }, [isEdit, entry, populated]);
 
+  // Auto-save logic
+  const doSave = useCallback(async () => {
+    if (savingRef.current) return;
+    const snapshot = formRef.current;
+    if (!snapshot.productName.trim()) return;
+
+    savingRef.current = true;
+    setSaveStatus('saving');
+    setSaveError(null);
+
+    try {
+      if (entryIdRef.current) {
+        await updateEntry(entryIdRef.current, snapshot);
+      } else {
+        const saved = await createEntry(snapshot);
+        entryIdRef.current = saved._id;
+        // Silently replace URL so subsequent saves are updates
+        window.history.replaceState(null, '', `/entry/${saved._id}/edit`);
+      }
+      setSaveStatus('saved');
+    } catch (err) {
+      console.error('Auto-save failed:', err);
+      setSaveStatus('error');
+      setSaveError(err.message || 'Save failed');
+    } finally {
+      savingRef.current = false;
+    }
+  }, [createEntry, updateEntry]);
+
+  const scheduleSave = useCallback(() => {
+    if (!dirtyRef.current) return;
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(doSave, AUTOSAVE_DELAY);
+  }, [doSave]);
+
+  // Trigger debounced save whenever form changes (after initial populate)
+  useEffect(() => {
+    if (!dirtyRef.current) return;
+    scheduleSave();
+    return () => clearTimeout(timerRef.current);
+  }, [form, scheduleSave]);
+
+  // Wrap setters to mark dirty
   const set = useCallback((field, value) => {
+    dirtyRef.current = true;
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const setNested = useCallback((parent, field, value) => {
+    dirtyRef.current = true;
     setForm((prev) => ({
       ...prev,
       [parent]: { ...prev[parent], [field]: value },
     }));
   }, []);
 
-  // Cannabinoid setter with clamping to 0-100
   const setCannabinoid = useCallback((key, raw) => {
+    dirtyRef.current = true;
     const clamped = clampNumeric(raw, 0, 100);
     setForm((prev) => ({
       ...prev,
@@ -141,38 +203,20 @@ const EntryFormPage = () => {
     }));
   }, []);
 
-  // Clamped setter for rating fields (0-10)
   const setClampedRating = useCallback((field, raw) => {
+    dirtyRef.current = true;
     const clamped = clampNumeric(raw, 0, 10);
     setForm((prev) => ({ ...prev, [field]: clamped }));
   }, []);
 
-  // Clamped setter for dosage numeric fields
   const setClampedDosage = useCallback((field, raw, min = 0, max = Infinity) => {
+    dirtyRef.current = true;
     const clamped = clampNumeric(raw, min, max);
     setForm((prev) => ({
       ...prev,
       dosage: { ...prev.dosage, [field]: clamped },
     }));
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSubmitError(null);
-    try {
-      const saved = isEdit
-        ? await updateEntry(id, form)
-        : await createEntry(form);
-      // After create, go to edit so user can continue refining; after update, go to view
-      navigate(isEdit ? `/entry/${saved._id}` : `/entry/${saved._id}/edit`);
-    } catch (err) {
-      console.error('EntryFormPage submit:', err);
-      setSubmitError(err.message || 'Failed to save entry');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   if (isEdit && loading && !populated) {
     return (
@@ -203,11 +247,7 @@ const EntryFormPage = () => {
         </header>
         <div className={styles.rastaStripe} role="presentation" />
 
-        {submitError && (
-          <p className={styles.errorBanner} role="alert">{submitError}</p>
-        )}
-
-        <form onSubmit={handleSubmit} noValidate>
+        <div>
           {/* 1 - Product Info */}
           <CollapsibleSection title="Product Info" defaultOpen>
             <div className={styles.fieldGroup}>
@@ -681,28 +721,38 @@ const EntryFormPage = () => {
                 onChange={(v) => set('coaImageUrls', v)}
                 multiple
               />
+              <label className={styles.label}>Misc Images</label>
+              <ImageUploader
+                value={form.miscImageUrls}
+                onChange={(v) => set('miscImageUrls', v)}
+                multiple
+              />
             </div>
           </CollapsibleSection>
 
-          {/* Sticky action bar */}
-          <div className={styles.actionBar}>
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={() => navigate(-1)}
-              disabled={submitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={styles.saveBtn}
-              disabled={submitting || !form.productName.trim()}
-            >
-              {submitting ? 'Saving\u2026' : isEdit ? 'Update Entry' : 'Create Entry'}
-            </button>
-          </div>
-        </form>
+        </div>
+      </div>
+
+      {/* Auto-save status indicator */}
+      <div
+        className={`${styles.autoSave} ${saveStatus !== 'idle' ? styles.autoSaveVisible : ''}`}
+        aria-live="polite"
+      >
+        {saveStatus === 'saving' && (
+          <>
+            <span className={styles.autoSaveSpinner} />
+            <span>Saving</span>
+          </>
+        )}
+        {saveStatus === 'saved' && (
+          <>
+            <span className={styles.autoSaveCheck}>&#10003;</span>
+            <span>Saved</span>
+          </>
+        )}
+        {saveStatus === 'error' && (
+          <span className={styles.autoSaveError} title={saveError || ''}>Save failed</span>
+        )}
       </div>
     </div>
   );
