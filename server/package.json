@@ -1,0 +1,37 @@
+{
+  "name": "weed-diary-server",
+  "version": "1.0.0",
+  "description": "Express API server for Chuck's Weed Diary",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "cross-env NODE_ENV=test AUTH_PASSWORD=test-password jest --detectOpenHandles --forceExit",
+    "test:verbose": "cross-env NODE_ENV=test AUTH_PASSWORD=test-password jest --detectOpenHandles --forceExit --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 30000
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "cloudinary": "^2.9.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.3.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.3.0",
+    "mongodb-memory-server": "^11.0.1",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
+  }
+}

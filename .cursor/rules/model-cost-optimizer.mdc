@@ -1,0 +1,46 @@
+---
+description: Assigns the cheapest viable AI model to each plan phase based on task complexity and token estimates
+alwaysApply: true
+---
+
+# Model Cost Optimizer
+
+When generating or executing a build plan, assign a specific Cursor model
+to each phase/task. Default to the cheapest model that can reliably handle
+the task's complexity. Escalate only when justified.
+
+## Task-to-Model Mapping
+
+| Task Complexity | Recommended Model | Escalate To |
+|----------------|-------------------|-------------|
+| Config files, .env, boilerplate, scaffolding | Gemini 2.5 Flash or Composer 2 | GPT-5.4 mini |
+| Single-file CRUD routes, simple middleware | GPT-5.4 mini or Claude 4.5 Haiku | Claude 4.6 Sonnet |
+| Multi-file components with interactions | Claude 4.6 Sonnet or GPT-5.4 | Claude 4.6 Opus |
+| Complex aggregation, analytics, pipelines | GPT-5.4 or Claude 4.6 Sonnet | Claude 4.6 Opus |
+| Test suites (well-specified) | GPT-5.4 mini | Claude 4.6 Sonnet |
+| Full-page integration (many deps) | Claude 4.6 Sonnet | Claude 4.6 Opus |
+| Architecture review, quality gates | Claude 4.6 Opus | -- |
+| CSS/theme/styling only | Gemini 2.5 Flash | Composer 2 |
+
+## Protocol
+
+1. Before each plan phase, run `npm run cost-analyze` (if available)
+   to get token estimates and model recommendations.
+2. State the chosen model and estimated cost in the plan phase header.
+3. If a phase fails or produces poor output, escalate one tier and note
+   the reason.
+4. Never use Opus Fast ($30/$150) unless the user explicitly requests it.
+5. Prefer Auto mode for exploratory/ambiguous tasks where routing helps.
+
+## Escalation Triggers
+
+Escalate to a more expensive model when:
+- The task requires reasoning across >50K tokens of context
+- Previous attempt with cheaper model produced incorrect output
+- The task involves security-sensitive logic (auth, input validation)
+- The task requires coordinating >5 files simultaneously
+
+## Cost Tracking
+
+Include a cost estimate line in each plan phase:
+`Model: [name] | Est. input: ~[X]K tokens | Est. output: ~[Y]K tokens | Est. cost: ~$[Z]`

@@ -1,0 +1,154 @@
+.root {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.legend {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  padding: 0 var(--spacing-xs) var(--spacing-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.option {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  text-align: center;
+}
+
+.option:hover {
+  border-color: var(--color-accent-green);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--color-accent-green);
+  outline-offset: 2px;
+}
+
+.optionSelected {
+  border-color: var(--color-accent-green);
+  background: color-mix(in srgb, var(--color-accent-green) 18%, var(--color-input-bg));
+  color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--color-accent-green);
+}
+
+.sliderRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs) var(--spacing-xs);
+}
+
+.sliderLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  width: 100%;
+}
+
+.slider {
+  flex: 1;
+  min-width: 0;
+  height: 6px;
+  accent-color: var(--color-accent-green);
+  cursor: pointer;
+}
+
+.strengthValue {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  min-width: 1.25rem;
+}
+
+.customForm {
+  margin-top: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.customLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.customRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.customInput {
+  flex: 1;
+  min-width: 120px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}
+
+.customInput:focus-visible {
+  outline: 2px solid var(--color-accent-green);
+  outline-offset: 2px;
+}
+
+.addBtn {
+  font-family: var(--font-body);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-accent-green);
+  background: var(--color-primary-green);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.addBtn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.addBtn:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.addBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

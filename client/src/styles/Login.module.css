@@ -1,0 +1,88 @@
+/* Login screen: centered card, dark backdrop */
+.shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-primary-dark);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.rastaStripe {
+  height: 3px;
+  width: 100%;
+  margin-bottom: var(--spacing-xl);
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-accent-green) 0%,
+    var(--color-accent-green) 33.33%,
+    var(--color-gold) 33.33%,
+    var(--color-gold) 66.67%,
+    var(--color-rasta-red) 66.67%,
+    var(--color-rasta-red) 100%
+  );
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  width: 100%;
+}
+
+.submit {
+  margin-top: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--color-accent-green);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.submit:hover {
+  background-color: var(--color-success);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 0.875rem;
+  margin-top: calc(var(--spacing-sm) * -1);
+}

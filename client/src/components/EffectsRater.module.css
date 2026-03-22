@@ -1,0 +1,113 @@
+.root {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.slider {
+  flex: 1;
+  min-width: 0;
+  height: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: var(--color-accent-green);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-green) 0%,
+    var(--color-accent-green) 50%,
+    var(--color-gold) 100%
+  );
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-green) 0%,
+    var(--color-accent-green) 55%,
+    var(--color-gold) 100%
+  );
+  border: 1px solid var(--color-border);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  border: 2px solid var(--color-accent-green);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-green) 0%,
+    var(--color-accent-green) 55%,
+    var(--color-gold) 100%
+  );
+  border: 1px solid var(--color-border);
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  border: 2px solid var(--color-accent-green);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.value {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  min-width: 1.5rem;
+  text-align: right;
+}
