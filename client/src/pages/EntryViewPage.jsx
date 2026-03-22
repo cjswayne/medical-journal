@@ -63,6 +63,42 @@ const EntryViewPage = () => {
     if (id) fetchEntry(id);
   }, [id, fetchEntry]);
 
+  const radarData = useMemo(() => ({
+    labels: EFFECT_KEYS.map((k) => EFFECT_LABELS[k] || k),
+    datasets: [{
+      label: 'Effects',
+      data: EFFECT_KEYS.map((k) => {
+        const v = entry?.effects?.[k];
+        return v != null && !Number.isNaN(Number(v)) ? Number(v) : 0;
+      }),
+      backgroundColor: 'rgba(76, 175, 80, 0.25)',
+      borderColor: '#4CAF50',
+      borderWidth: 2,
+      pointBackgroundColor: '#4CAF50',
+      pointBorderColor: '#E8F5E9',
+    }],
+  }), [entry?.effects]);
+
+  const radarOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 10,
+        angleLines: { color: '#1B5E20' },
+        grid: { color: '#1B5E20' },
+        pointLabels: { color: '#A5D6A7', font: { size: 10 } },
+        ticks: {
+          color: '#A5D6A7',
+          backdropColor: 'transparent',
+          showLabelBackdrop: false,
+        },
+      },
+    },
+    plugins: { legend: { display: false } },
+  }), []);
+
   if (loading && !entry) {
     return (
       <div className={styles.page}>
@@ -111,42 +147,6 @@ const EntryViewPage = () => {
   const coaUrls = Array.isArray(coaImageUrls) ? coaImageUrls.filter(Boolean) : [];
   const displayDate = purchaseDate || createdAt;
   const thumbSrc = flowerImageUrl ? cloudinaryTransform(flowerImageUrl, 150) : '';
-
-  const radarData = useMemo(() => ({
-    labels: EFFECT_KEYS.map((k) => EFFECT_LABELS[k] || k),
-    datasets: [{
-      label: 'Effects',
-      data: EFFECT_KEYS.map((k) => {
-        const v = effects?.[k];
-        return v != null && !Number.isNaN(Number(v)) ? Number(v) : 0;
-      }),
-      backgroundColor: 'rgba(76, 175, 80, 0.25)',
-      borderColor: '#4CAF50',
-      borderWidth: 2,
-      pointBackgroundColor: '#4CAF50',
-      pointBorderColor: '#E8F5E9',
-    }],
-  }), [effects]);
-
-  const radarOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: true,
-    scales: {
-      r: {
-        beginAtZero: true,
-        max: 10,
-        angleLines: { color: '#1B5E20' },
-        grid: { color: '#1B5E20' },
-        pointLabels: { color: '#A5D6A7', font: { size: 10 } },
-        ticks: {
-          color: '#A5D6A7',
-          backdropColor: 'transparent',
-          showLabelBackdrop: false,
-        },
-      },
-    },
-    plugins: { legend: { display: false } },
-  }), []);
 
   return (
     <div className={styles.page}>
