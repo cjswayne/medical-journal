@@ -31,14 +31,31 @@
   gap: var(--spacing-md);
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
 .title {
   font-family: var(--font-heading);
   font-size: clamp(1.35rem, 4vw, 2rem);
   color: var(--color-text-primary);
   line-height: 1.15;
   margin: 0;
-  flex: 1;
   min-width: 0;
+}
+
+.productBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 10px;
+  border-radius: 4px;
+  color: var(--color-primary-dark);
+  white-space: nowrap;
 }
 
 .thumb {

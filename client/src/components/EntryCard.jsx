@@ -30,7 +30,7 @@ const topEffects = (effects, n = 2) => {
 
 const EntryCard = ({ entry }) => {
   const {
-    _id, productName, flowerImageUrl, purchaseDate, createdAt,
+    _id, productName, productType, flowerImageUrl, purchaseDate, createdAt,
     strains, recreationalRating, terpenes, effects, dispensary,
   } = entry || {};
 
@@ -56,22 +56,24 @@ const EntryCard = ({ entry }) => {
         )}
       </div>
       <div className={styles.body}>
-        <h3 className={styles.title}>{productName || 'Untitled'}</h3>
+        <div className={styles.titleRow}>
+          <h3 className={styles.title}>{productName || 'Untitled'}</h3>
+          {productType && (
+            <span
+              className={styles.productBadge}
+              style={{ backgroundColor: STRAIN_TYPE_COLORS[productType] || 'var(--color-border)' }}
+            >
+              {capitalize(productType)}
+            </span>
+          )}
+        </div>
 
-        {/* Strains with type badge */}
+        {/* Strain names */}
         {Array.isArray(strains) && strains.length > 0 && (
           <div className={styles.strains}>
             {strains.map((s, i) => (
-              <span key={`${s.name}-${i}`} className={styles.strain}>
-                <span className={styles.strainName}>{s.name}</span>
-                {s.type && (
-                  <span
-                    className={styles.strainBadge}
-                    style={{ backgroundColor: STRAIN_TYPE_COLORS[s.type] || 'var(--color-border)' }}
-                  >
-                    {capitalize(s.type)}
-                  </span>
-                )}
+              <span key={`${s.name}-${i}`} className={styles.strainName}>
+                {s.name}
               </span>
             ))}
           </div>

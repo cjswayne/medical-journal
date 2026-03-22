@@ -5,7 +5,7 @@ const authCheck = require('../middleware/authCheck');
 
 const router = express.Router();
 
-const CONDENSED_SELECT = '_id productName flowerImageUrl strains purchaseDate dispensary.location cannabinoids.thc cannabinoids.cbd medicalRating recreationalRating terpenes.dominant terpenes.secondary effects createdAt';
+const CONDENSED_SELECT = '_id productName productType flowerImageUrl strains purchaseDate dispensary.location cannabinoids.thc cannabinoids.cbd medicalRating recreationalRating terpenes.dominant terpenes.secondary effects createdAt';
 
 // Cache for detail/search reads only; list endpoint uses no-cache to avoid stale data after writes
 function setPublicCache(res) {

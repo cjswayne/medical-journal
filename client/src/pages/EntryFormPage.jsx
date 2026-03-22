@@ -14,6 +14,7 @@ import {
   CONSUMPTION_METHODS,
   CANNABINOID_KEYS,
   CANNABINOID_LABELS,
+  STRAIN_TYPES,
   todayISO,
 } from '../utils/constants';
 import { capitalize, formatDate } from '../utils/formatters';
@@ -31,6 +32,7 @@ const clampNumeric = (raw, min, max) => {
 
 const buildDefaults = () => ({
   productName: '',
+  productType: '',
   strains: [],
   brand: '',
   purchaseDate: todayISO(),
@@ -61,6 +63,7 @@ const buildDefaults = () => ({
   otherEffectsNotes: '',
   medicalRating: '',
   recreationalRating: '',
+  notes: '',
   flowerImageUrl: '',
   coaImageUrls: [],
 });
@@ -212,14 +215,32 @@ const EntryFormPage = () => {
               <label className={styles.label} htmlFor="productName">
                 Product Name <span className={styles.required}>*</span>
               </label>
-              <input
-                id="productName"
-                className={styles.input}
-                type="text"
-                required
-                value={form.productName}
-                onChange={(e) => set('productName', e.target.value)}
-              />
+              <div className={styles.row}>
+                <div className={styles.col} style={{ flex: 1 }}>
+                  <input
+                    id="productName"
+                    className={styles.input}
+                    type="text"
+                    required
+                    value={form.productName}
+                    onChange={(e) => set('productName', e.target.value)}
+                  />
+                </div>
+                <div className={styles.col}>
+                  <select
+                    id="productType"
+                    className={styles.select}
+                    value={form.productType}
+                    onChange={(e) => set('productType', e.target.value)}
+                    aria-label="Product strain type"
+                  >
+                    <option value="">— Type —</option>
+                    {STRAIN_TYPES.map((t) => (
+                      <option key={t} value={t}>{capitalize(t)}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
               <label className={styles.label}>Strains</label>
               <StrainList
@@ -631,7 +652,22 @@ const EntryFormPage = () => {
             </div>
           </CollapsibleSection>
 
-          {/* 11 - Images */}
+          {/* 11 - Notes */}
+          <CollapsibleSection title="Notes" defaultOpen>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="notes">Final Notes</label>
+              <textarea
+                id="notes"
+                className={styles.textarea}
+                rows={4}
+                value={form.notes}
+                onChange={(e) => set('notes', e.target.value)}
+                placeholder="Any additional thoughts, observations, or reminders..."
+              />
+            </div>
+          </CollapsibleSection>
+
+          {/* 12 - Images */}
           <CollapsibleSection title="Images" defaultOpen>
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Flower Image</label>

@@ -121,7 +121,7 @@ const EntryViewPage = () => {
   if (!entry) return null;
 
   const {
-    productName, strains, brand,
+    productName, productType, strains, brand,
     quantity, price, priceNotes,
     dispensary,
     cannabisForm, customCannabisForm, cannabisFormNotes,
@@ -132,6 +132,7 @@ const EntryViewPage = () => {
     dosage,
     effects, symptomsRelievedNotes, otherEffectsNotes,
     medicalRating, recreationalRating,
+    notes,
     flowerImageUrl, coaImageUrls,
     purchaseDate, createdAt,
   } = entry;
@@ -164,7 +165,17 @@ const EntryViewPage = () => {
               />
             )}
             <div>
-              <h1 className={styles.title}>{productName || 'Untitled Entry'}</h1>
+              <div className={styles.titleRow}>
+                <h1 className={styles.title}>{productName || 'Untitled Entry'}</h1>
+                {productType && (
+                  <span
+                    className={styles.productBadge}
+                    style={{ backgroundColor: STRAIN_TYPE_COLORS[productType] || 'var(--color-border)' }}
+                  >
+                    {capitalize(productType)}
+                  </span>
+                )}
+              </div>
               <p className={styles.date}>{formatDate(displayDate)}</p>
             </div>
           </div>
@@ -394,6 +405,11 @@ const EntryViewPage = () => {
               </div>
             )}
           </div>
+        </Section>
+
+        {/* Notes */}
+        <Section title="Notes" visible={hasContent(notes)}>
+          <p className={styles.notes}>{notes}</p>
         </Section>
 
         {/* Images */}

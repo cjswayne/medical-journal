@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const entrySchema = new mongoose.Schema({
   // Product
   productName: { type: String, required: true, trim: true },
+  productType: { type: String, enum: ['sativa', 'indica', 'hybrid', ''], default: '' },
   strains: [{
     name: { type: String, required: true, trim: true },
     type: { type: String, enum: ['sativa', 'indica', 'hybrid', ''], default: '' }
@@ -109,6 +110,9 @@ const entrySchema = new mongoose.Schema({
   medicalRating:      { type: Number, min: 0, max: 10, default: null },
   recreationalRating: { type: Number, min: 0, max: 10, default: null },
 
+  // Notes
+  notes: { type: String, default: '' },
+
   // Images
   flowerImageUrl: { type: String, default: '' },
   coaImageUrls:   [{ type: String }]
@@ -122,7 +126,8 @@ entrySchema.index({
   'dispensary.name': 'text',
   aromaNotes: 'text',
   flavorNotes: 'text',
-  priceNotes: 'text'
+  priceNotes: 'text',
+  notes: 'text'
 });
 
 module.exports = mongoose.model('Entry', entrySchema);
